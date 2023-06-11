@@ -20,6 +20,7 @@
 #include "espFeatures/ledcFeature.h"
 #include "espFeatures/adcFeature.h"
 #include "espFeatures/i2cFeature.h"
+#include "espFeatures/rofiFeature.h"
 
 #include "util/uartStream.h"
 
@@ -55,6 +56,7 @@ using Machine = jac::ComposeMachine<
     AdcFeature,
     I2CFeature,
     NeopixelFeature,
+    RofiFeature,
     jac::TimersFeature,
     jac::EventLoopTerminal
 >;
