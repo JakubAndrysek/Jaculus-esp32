@@ -86,19 +86,19 @@ public:
         return id;
     }
 
-    Joint getJoint( int i ) {
+    Joint& getJoint( int i ) {
         printf("RoFI::getJoint\n");
         return joint[i];
     }
 
-    Connector getConnector( int i ) {
+    Connector& getConnector( int i ) {
         printf("RoFI::getConnector\n");
         return connector[i];
     }
 
 
 private:
-    Id id;
+    Id id = 333;
     Connector connector[3];
     Joint joint[3];
 };

@@ -11,57 +11,17 @@
 
 #include <set>
 
-
-// template<>
-// struct jac::ConvTraits<Rgb> {
-//     static Value to(ContextRef ctx, Rgb val) {
-//         auto obj = Object::create(ctx);
-//         obj.set<int>("r", val.r);
-//         obj.set<int>("g", val.g);
-//         obj.set<int>("b", val.b);
-//         return obj;
-//     }
-
-//     static Rgb from(ContextRef ctx, ValueWeak val) {
-//         auto obj = val.to<Object>();
-//         return Rgb(obj.get<int>("r"), obj.get<int>("g"), obj.get<int>("b"));
-//     }
-// };
-
-
 template<class Next>
 class RofiFeature : public Next {
     // static inline std::set<int> _usedRmtChannels;
 
     struct RofiJointProtoBuilder : public jac::ProtoBuilder::Opaque<rofi::hal::Joint>, public jac::ProtoBuilder::Properties {
         static rofi::hal::Joint* constructOpaque(JSContext* ctx, std::vector<jac::ValueWeak> args) {
-            // if (args.size() != 2) {
-            //     throw std::runtime_error("Invalid number of arguments");
-            // }
-            // int pin = args[0].to<int>();
-            // int count = args[1].to<int>();
-
-            // if (Next::PlatformInfo::PinConfig::DIGITAL_PINS.find(pin) == Next::PlatformInfo::PinConfig::DIGITAL_PINS.end()) {
-            //     throw std::runtime_error("Invalid pin number");
-            // }
-
-            // int channel = 0;
-            // while (_usedRmtChannels.find(channel) != _usedRmtChannels.end()) {
-            //     channel++;
-            // }
-            // if (channel >= 4) {
-            //     throw std::runtime_error("No available RMT channels");
-            // }
-            // _usedRmtChannels.insert(channel);
-			printf("rofi::hal::Joint constructor\n");
-
             return new rofi::hal::Joint();
         }
 
         static void destroyOpaque(JSRuntime* rt, rofi::hal::Joint* ptr) noexcept {
-            if (!ptr) {
-                return;
-            }
+            if (!ptr) return;
             delete ptr;
         }
 
@@ -83,33 +43,11 @@ class RofiFeature : public Next {
 
     struct RofiConnectorProtoBuilder : public jac::ProtoBuilder::Opaque<rofi::hal::Connector>, public jac::ProtoBuilder::Properties {
         static rofi::hal::Connector* constructOpaque(JSContext* ctx, std::vector<jac::ValueWeak> args) {
-            // if (args.size() != 2) {
-            //     throw std::runtime_error("Invalid number of arguments");
-            // }
-            // int pin = args[0].to<int>();
-            // int count = args[1].to<int>();
-
-            // if (Next::PlatformInfo::PinConfig::DIGITAL_PINS.find(pin) == Next::PlatformInfo::PinConfig::DIGITAL_PINS.end()) {
-            //     throw std::runtime_error("Invalid pin number");
-            // }
-
-            // int channel = 0;
-            // while (_usedRmtChannels.find(channel) != _usedRmtChannels.end()) {
-            //     channel++;
-            // }
-            // if (channel >= 4) {
-            //     throw std::runtime_error("No available RMT channels");
-            // }
-            // _usedRmtChannels.insert(channel);
-			printf("rofi::hal::Connector constructor\n");
-
             return new rofi::hal::Connector();
         }
 
         static void destroyOpaque(JSRuntime* rt, rofi::hal::Connector* ptr) noexcept {
-            if (!ptr) {
-                return;
-            }
+            if (!ptr) return;
             delete ptr;
         }
 
@@ -131,14 +69,50 @@ class RofiFeature : public Next {
 
 
 
+    struct RofiProtoBuilder : public jac::ProtoBuilder::Opaque<rofi::hal::RoFI>, public jac::ProtoBuilder::Properties {
+        static rofi::hal::RoFI* constructOpaque(JSContext* ctx, std::vector<jac::ValueWeak> args) {
+            return new rofi::hal::RoFI();
+        }
+
+        static void destroyOpaque(JSRuntime* rt, rofi::hal::RoFI* ptr) noexcept {
+            if (!ptr) return;
+            delete ptr;
+        }
+
+        static void addProperties(JSContext* ctx, jac::Object proto) {
+            jac::FunctionFactory ff(ctx);
+
+            proto.defineProperty("getId", ff.newFunctionThis([](jac::ContextRef ctx, jac::ValueWeak thisValue) {
+                rofi::hal::RoFI& rofi = *getOpaque(ctx, thisValue);
+                return rofi.getId();
+            }), jac::PropFlags::Enumerable);
+
+
+            // proto.defineProperty("getConnector", ff.newFunctionThis([](jac::ContextRef ctx, jac::ValueWeak thisValue, int index) {
+            //     rofi::hal::RoFI& rofi = *getOpaque(ctx, thisValue);
+
+            //     // Here, you would need to implement a method in your RoFI class that
+            //     // gets a Connector by index. This might look something like this:
+            //     rofi::hal::Connector& connector = rofi.getConnector(index);
+
+            //     // Then you return a new JavaScript object that wraps your Connector instance
+            //     return RofiConnectorClass::constructOpaque(ctx, {jac::Value::from(ctx, &connector)});
+            // }), jac::PropFlags::Enumerable);
+
+
+        }
+    };
+
 
 public:
     using RofiJointClass = jac::Class<RofiJointProtoBuilder>;
     using RofiConnectorClass = jac::Class<RofiConnectorProtoBuilder>;
+    using RofiClass = jac::Class<RofiProtoBuilder>;
 
     RofiFeature() {
         RofiJointClass::init("Joint");
         RofiConnectorClass::init("Connector");
+        RofiClass::init("RoFI");
     }
 
     void initialize() {
@@ -150,5 +124,8 @@ public:
 
         jac::Function connector = RofiConnectorClass::getConstructor(this->context());
         mod.addExport("Connector", connector);
+
+        jac::Function rofi = RofiClass::getConstructor(this->context());
+        mod.addExport("RoFI", rofi);
     }
 };
