@@ -1,9 +1,5 @@
 declare module "rofi" {
-    // interface Rgb {
-    //     r: number;
-    //     g: number;
-    //     b: number;
-    // }
+    function getLocalRofi(): Rofi;
 
     class Rofi {
         getId(): number;
@@ -32,8 +28,4 @@ declare module "rofi" {
         public connect(): void;
         public disconnect(): void;
     }
-
-
-
-
 }

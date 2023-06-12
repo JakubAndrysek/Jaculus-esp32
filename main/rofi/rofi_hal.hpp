@@ -80,6 +80,12 @@ private:
 
 class RoFI {
 public:
+
+    RoFI getLocalRoFI() {
+        static RoFI localRoFI;
+        return localRoFI;
+    }
+
     using Id = int;
 
     Id getId() const {
